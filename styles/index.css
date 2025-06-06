@@ -1,0 +1,27 @@
+/* src/styles/index.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #cceeff; /* Light blue sky */
+  font-family: 'Press Start 2P', cursive;
+  color: #222;
+}
+
+button {
+  font-family: 'Press Start 2P', cursive;
+  padding: 10px 20px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  background-color: #ffcc00;
+  color: #000;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
