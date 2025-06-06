@@ -1,7 +1,11 @@
+//login.js
+
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Press_Start_2P } from "next/font/google";
+import { useRouter } from "next/router";
+import { supabase } from "@/lib/supabaseClient.js"; // adjust path as needed
 
 const pressStart2P = Press_Start_2P({
   weight: "400",
@@ -10,19 +14,52 @@ const pressStart2P = Press_Start_2P({
 
 export default function Login() {
   const [isRegister, setIsRegister] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
 
   const toggleMode = () => {
+    setErrorMsg("");
     setIsRegister((prev) => !prev);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Placeholder for login/register logic
+    setErrorMsg("");
+    setLoading(true);
+
     if (isRegister) {
-      console.log("Registering...");
+      // Register user
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        setErrorMsg(error.message);
+      } else {
+        alert(
+          "Registration successful! Please check your email for confirmation link."
+        );
+      }
     } else {
-      console.log("Logging in...");
+      // Login user
+      const { error } = await supabase.auth.signInWithPassword({
+          email, 
+        password,
+      });
+
+      if (error) {
+        setErrorMsg(error.message);
+      } else {
+        router.push("/GamePages/home");
+      }      
     }
+
+    setLoading(false);
   };
 
   return (
@@ -49,16 +86,25 @@ export default function Login() {
           placeholder="Email"
           required
           className="px-4 py-3 rounded border-2 border-yellow-500 focus:outline-none text-sm"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
           placeholder="Password"
           required
           className="px-4 py-3 rounded border-2 border-yellow-500 focus:outline-none text-sm"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
+
+        {errorMsg && (
+          <p className="text-xs text-red-600 italic">{errorMsg}</p>
+        )}
 
         <button
           type="submit"
+          disabled={loading}
           className={`
             ${pressStart2P.className}
             bg-yellow-400 hover:bg-yellow-300
@@ -79,9 +125,10 @@ export default function Login() {
             active:border-b-2
             active:border-r-2
             uppercase
+            ${loading ? "opacity-50 cursor-not-allowed" : ""}
           `}
         >
-          {isRegister ? "SIGN UP" : "SIGN IN"}
+          {loading ? "Please wait..." : isRegister ? "SIGN UP" : "SIGN IN"}
         </button>
       </form>
 
