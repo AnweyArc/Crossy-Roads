@@ -52,7 +52,7 @@ export default function Home() {
 
       {/* Menu Buttons with enhanced 3D effect */}
       <div className="flex flex-col gap-6 w-full max-w-xs z-10">
-        <Link href="/gamePages/game">
+        <Link href="/GamePages/game">
           <button
             className={`
               ${pressStart2P.className}
