@@ -24,10 +24,48 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-.text-outline {
-  text-shadow: 
-    -2px -2px 0 #000,
-    2px -2px 0 #000,
-    -2px 2px 0 #000,
-    2px 2px 0 #000;
+@keyframes soft-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes shine {
+  100% { left: 150%; }
+}
+
+@keyframes float-slow {
+  0% { transform: translateX(-100px); }
+  100% { transform: translateX(calc(100vw + 100px)); }
+}
+
+@keyframes float-medium {
+  0% { transform: translateX(-150px); }
+  100% { transform: translateX(calc(100vw + 150px)); }
+}
+
+@keyframes float-fast {
+  0% { transform: translateX(-200px); }
+  100% { transform: translateX(calc(100vw + 200px)); }
+}
+
+.animate-soft-bounce {
+  animation: soft-bounce 2.5s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 25s linear infinite;
+}
+
+.animate-float-medium {
+  animation: float-medium 20s linear infinite;
+  animation-delay: 3s;
+}
+
+.animate-float-fast {
+  animation: float-fast 15s linear infinite;
+  animation-delay: 7s;
+}
+
+.animate-shine {
+  animation: shine 1.5s ease-out;
 }
