@@ -1,9 +1,23 @@
+// world.js
+
+import { Road as createRoad, Truck } from "./roads.js";
+import { Tree as createTree } from "./trees.js";
 import { createGrass } from "./terrain.js";
-import { tileSize } from "./constants.js";
 
 export function initializeMap(scene) {
-  for (let i = 0; i < 10; i++) {
+  const mapLength = 10;
+
+  for (let i = 0; i < mapLength; i++) {
+    // Add grass tile
     const grass = createGrass(i);
     scene.add(grass);
+
+    // Add road tile
+    const road = createRoad(i);
+    scene.add(road);
+
+    // Add tree
+    const tree = createTree(i);
+    scene.add(tree);
   }
 }
