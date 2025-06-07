@@ -6,42 +6,59 @@ import { createPlayer } from './player.js';
 import { initializeMap } from './world.js';
 import { setupControls } from './controls.js';
 import { detectCollision } from './collision.js';
-import { spawnVehicle, moveVehicle, resetVehiclePosition } from './vehicles.js';
+import { Car, Truck, moveVehicle, resetVehiclePosition } from './vehicles.js';
 
 export function initGame(container) {
   const scene = new THREE.Scene();
+
+  // Camera & Renderer
   const camera = createCamera();
   const renderer = createRenderer(container);
-  const player = createPlayer();
+
+  // Lighting
   const directionalLight = createDirectionalLight();
   const ambientLight = createAmbientLight();
+  scene.add(directionalLight, ambientLight);
 
+  // Player
+  const player = createPlayer();
   scene.add(player);
-  scene.add(directionalLight);
-  scene.add(ambientLight);
 
+  // World terrain
   initializeMap(scene);
 
+  // Vehicles
   const vehicles = [];
 
-  vehicles.push(spawnVehicle('car', 1, -50, 1));   // row 1, left lane, moving right
-  vehicles.push(spawnVehicle('truck', 3, 0, -1));  // row 3, center lane, moving left
-  vehicles.push(spawnVehicle('car', 5, 50, 1));    // row 5, right lane, moving right
+  const vehicleConfigs = [
+    { type: 'car', index: -2, row: 1, direction: 1 },
+    { type: 'truck', index: 0, row: 3, direction: -1 },
+    { type: 'car', index: 2, row: 5, direction: 1 }
+  ];
 
-  vehicles.forEach(v => scene.add(v));
+  vehicleConfigs.forEach(({ type, index, row, direction }) => {
+    const vehicle = type === 'car' ? Car(index, direction) : Truck(index, direction);
+    vehicle.position.y = row * 42;
+    vehicle.userData = { direction };
+    vehicles.push(vehicle);
+    scene.add(vehicle);
+  });
 
+  // Controls
   setupControls(player, () => {
     detectCollision(player, vehicles);
   });
 
+  // Camera setup
   camera.position.set(0, -300, 200);
   camera.lookAt(0, 0, 0);
   camera.updateProjectionMatrix();
 
+  // Game loop
   function gameLoop(time = 0) {
     const delta = time * 0.001;
     const speed = 20;
-    const limit = 100;
+    const limit = 150;
 
     vehicles.forEach(vehicle => {
       moveVehicle(vehicle, speed, delta);
