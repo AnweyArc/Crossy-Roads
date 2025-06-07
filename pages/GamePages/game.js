@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import GameUI from '@/components/GameUI'; // ✅ import your UI
-import '@/styles/game.css';
 
 
 export default function GamePage() {
