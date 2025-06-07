@@ -1,10 +1,9 @@
 import * as THREE from 'three';
 import { createCamera } from './camera.js';
 import { createRenderer } from './renderer.js';
-import { createDirectionalLight } from './lighting.js';
+import { createDirectionalLight, createAmbientLight } from './lighting.js';
 import { createPlayer } from './player.js';
-import { initializeMap } from './world.js';  // initializes grass, roads, trees
-import { animate } from './animation.js';
+import { initializeMap } from './world.js';
 import { setupControls } from './controls.js';
 import { detectCollision } from './collision.js';
 import { spawnVehicle, moveVehicle, resetVehiclePosition } from './vehicles.js';
@@ -14,46 +13,42 @@ export function initGame(container) {
   const camera = createCamera();
   const renderer = createRenderer(container);
   const player = createPlayer();
-  const light = createDirectionalLight();
+  const directionalLight = createDirectionalLight();
+  const ambientLight = createAmbientLight();
 
-  scene.add(camera, light, player);
+  scene.add(player);
+  scene.add(directionalLight);
+  scene.add(ambientLight);
 
-  // Initialize map (adds grass, roads, trees)
   initializeMap(scene);
 
-  // Vehicles array to hold all vehicle meshes
   const vehicles = [];
 
-  // Example spawn positions for vehicles aligned with roads/lanes
-  // Adjust 'z' values based on road lane positions in your world
-  vehicles.push(spawnVehicle('car', -10, 0));     // Lane 0
-  vehicles.push(spawnVehicle('truck', -20, 1));   // Lane 1
-  vehicles.push(spawnVehicle('car', -30, 0));     // Lane 0
+  vehicles.push(spawnVehicle('car', 1, -50, 1));   // row 1, left lane, moving right
+  vehicles.push(spawnVehicle('truck', 3, 0, -1));  // row 3, center lane, moving left
+  vehicles.push(spawnVehicle('car', 5, 50, 1));    // row 5, right lane, moving right
 
-  // Add all vehicles to the scene
-  vehicles.forEach(vehicle => scene.add(vehicle));
+  vehicles.forEach(v => scene.add(v));
 
-  // Setup player controls and collision detection against vehicles
   setupControls(player, () => {
     detectCollision(player, vehicles);
   });
 
-  // Game loop for animation and updates
-  function gameLoop(time) {
-    const delta = time ? time * 0.001 : 0; // Convert ms to seconds
+  camera.position.set(0, -300, 200);
+  camera.lookAt(0, 0, 0);
+  camera.updateProjectionMatrix();
 
-    // Update vehicles: move forward and reset if out of bounds
-    const speed = 5;
-    const limit = 30;
+  function gameLoop(time = 0) {
+    const delta = time * 0.001;
+    const speed = 20;
+    const limit = 100;
 
     vehicles.forEach(vehicle => {
       moveVehicle(vehicle, speed, delta);
       resetVehiclePosition(vehicle, limit);
     });
 
-    // Render scene and camera
-    animate(renderer, scene, camera);
-
+    renderer.render(scene, camera);
     requestAnimationFrame(gameLoop);
   }
 

@@ -1,8 +1,6 @@
-// world.js
-
-import { Road as createRoad, Truck } from "./roads.js";
-import { Tree as createTree } from "./trees.js";
-import { createGrass } from "./terrain.js";
+import { Road } from './roads.js';
+import { Tree } from './trees.js';
+import { createGrass } from './terrain.js';
 
 export function initializeMap(scene) {
   const mapLength = 10;
@@ -13,11 +11,11 @@ export function initializeMap(scene) {
     scene.add(grass);
 
     // Add road tile
-    const road = createRoad(i);
+    const road = Road(i);
     scene.add(road);
 
-    // Add tree
-    const tree = createTree(i);
+    // Add tree on the left side
+    const tree = Tree(i);
     scene.add(tree);
   }
 }
