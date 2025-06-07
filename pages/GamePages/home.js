@@ -88,7 +88,7 @@ export default function Home() {
           </button>
         </Link>
 
-        <Link href="/gamePages/leaderboards">
+        <Link href="/GamePages/leaderboards">
           <button
             className={`
               ${pressStart2P.className}
@@ -124,7 +124,7 @@ export default function Home() {
           </button>
         </Link>
 
-        <Link href="/gamePages/settings">
+        <Link href="/GamePages/settings">
           <button
             className={`
               ${pressStart2P.className}
