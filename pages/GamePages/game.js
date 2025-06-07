@@ -1,5 +1,8 @@
 'use client';
 import { useEffect, useRef } from 'react';
+import GameUI from '@/components/GameUI'; // ✅ import your UI
+import '@/styles/game.css';
+
 
 export default function GamePage() {
   const containerRef = useRef(null);
@@ -14,5 +17,9 @@ export default function GamePage() {
     loadGame();
   }, []);
 
-  return <div ref={containerRef} className="w-screen h-screen overflow-hidden" />;
+  return (
+    <div ref={containerRef} className="relative w-screen h-screen overflow-hidden bg-black">
+      <GameUI />
+    </div>
+  );
 }

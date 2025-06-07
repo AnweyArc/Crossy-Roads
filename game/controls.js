@@ -15,11 +15,11 @@ export function setupControls(player, onMove = () => {}) {
     switch (e.code) {
       case 'ArrowUp':
       case 'KeyW':
-        movePlayer(0, -1);
+        movePlayer(0, 1);
         break;
       case 'ArrowDown':
       case 'KeyS':
-        movePlayer(0, 1);
+        movePlayer(0, -1);
         break;
       case 'ArrowLeft':
       case 'KeyA':
@@ -31,6 +31,11 @@ export function setupControls(player, onMove = () => {}) {
         break;
     }
   };
+  document.getElementById("forward")?.addEventListener("click", () => movePlayer(0, -1));
+  document.getElementById("backward")?.addEventListener("click", () => movePlayer(0, 1));
+  document.getElementById("left")?.addEventListener("click", () => movePlayer(-1, 0));
+  document.getElementById("right")?.addEventListener("click", () => movePlayer(1, 0));
+
 
   const keyUpHandler = (e) => keys.delete(e.code);
 
