@@ -1,30 +1,36 @@
 import * as THREE from 'three';
 
 export function createCamera() {
-  const size = 300;
-  const viewRatio = window.innerWidth / window.innerHeight;
-  const width = viewRatio < 1 ? size : size * viewRatio;
-  const height = viewRatio < 1 ? size / viewRatio : size;
+  const fov = 45; // Field of view
+  const aspect = window.innerWidth / window.innerHeight;
+  const near = 1;
+  const far = 10000;
 
-  const camera = new THREE.OrthographicCamera(
-    width / -2,
-    width / 2,
-    height / 2,
-    height / -2,
-    1,
-    5000    // or even 10000, if your map is endless
-  );
-  
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
+  // Position camera behind and above player
+  camera.position.set(0, -300, 200); // Adjust as needed
   camera.up.set(0, 0, 1);
-  camera.position.set(300, -300, 300);
-  camera.lookAt(0, 0, 0);
+
+  // Look slightly ahead of the origin (player will be near 0,0)
+  camera.lookAt(new THREE.Vector3(0, 100, 0));
 
   return camera;
 }
 
 export function updateCamera(camera, player) {
-  camera.position.y = player.position.y + 300; // ahead of player (not behind)
-  camera.lookAt(new THREE.Vector3(0, player.position.y, 0));
-}
+  // Position camera relative to player
+  // Behind on Y axis, above on Z axis
+  camera.position.x = player.position.x;
+  camera.position.y = player.position.y - 300; // behind player
+  camera.position.z = player.position.z + 200; // above player
 
+  // Look at a point slightly ahead of player to give forward view
+  const lookAtPoint = new THREE.Vector3(
+    player.position.x,
+    player.position.y + 100,
+    player.position.z
+  );
+
+  camera.lookAt(lookAtPoint);
+}
