@@ -62,8 +62,12 @@ export function initGame(container) {
   camera.updateProjectionMatrix();
 
   // Game loop
+  let lastTime = 0;
+
   function gameLoop(time = 0) {
-    const delta = time * 0.001;
+    const delta = (time - lastTime) * 0.001; // convert ms to seconds
+    lastTime = time;
+
     const speed = 20;
     const limit = 150;
 
@@ -77,4 +81,5 @@ export function initGame(container) {
   }
 
   requestAnimationFrame(gameLoop);
+
 }
