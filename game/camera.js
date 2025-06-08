@@ -11,8 +11,8 @@ export function createCamera() {
     width / 2,
     height / 2,
     height / -2,
-    100,
-    900
+    1,     // near plane closer to 1
+    1000   // far plane far away
   );
 
   camera.up.set(0, 0, 1);
@@ -23,7 +23,7 @@ export function createCamera() {
 }
 
 export function updateCamera(camera, player) {
-  // Adjust camera position to follow the player in the Y direction
-  camera.position.y = player.position.y - 300;
+  camera.position.y = player.position.y + 300; // ahead of player (not behind)
   camera.lookAt(new THREE.Vector3(0, player.position.y, 0));
 }
+

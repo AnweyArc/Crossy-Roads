@@ -40,13 +40,11 @@ export function createRoad(rowIndex) {
   return group;
 }
 
-export function createTree(tileIndex, height) {
+export function createTree(tileIndex, height = 30) {
   const tree = new THREE.Group();
-
-  // Position tree along the X axis based on tileIndex
   tree.position.x = tileIndex * tileSize;
 
-  // Create trunk
+  // Trunk
   const trunk = new THREE.Mesh(
     new THREE.CylinderGeometry(1, 1, height, 8),
     new THREE.MeshLambertMaterial({ color: 0x8b5a2b })
@@ -54,7 +52,7 @@ export function createTree(tileIndex, height) {
   trunk.position.y = height / 2;
   tree.add(trunk);
 
-  // Create leaves
+  // Leaves (safe now because height has a default)
   const leaves = new THREE.Mesh(
     new THREE.SphereGeometry(height / 2, 8, 8),
     new THREE.MeshLambertMaterial({ color: 0x228b22 })
@@ -64,3 +62,4 @@ export function createTree(tileIndex, height) {
 
   return tree;
 }
+

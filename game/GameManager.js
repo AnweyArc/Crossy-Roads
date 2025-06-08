@@ -3,15 +3,12 @@ import { createCamera, updateCamera } from './camera.js';
 import { createRenderer } from './renderer.js';
 import { createDirectionalLight, createAmbientLight } from './lighting.js';
 import { createPlayer } from './player.js';
-import { map, initializeMap, addRows, metadata } from './map.js';
+import { map, initializeMap, addRows, metadata, activeVehicles } from './map.js';
 import { setupControls } from './controls.js';
 import { detectCollision } from './collision.js';
 import {
-  Car,
-  Truck,
   moveVehicle,
   resetVehiclePosition,
-  TILE_SIZE,
   LANE_HEIGHT
 } from './vehicles.js';
 
@@ -36,29 +33,13 @@ export function initGame(container) {
   initializeMap();
   scene.add(map);
 
-  // Vehicles
-  const vehicles = [];
-
-  const vehicleConfigs = [
-    { type: 'car', index: -2, row: 1, direction: 1 },
-    { type: 'truck', index: 0, row: 3, direction: -1 },
-    { type: 'car', index: 2, row: 5, direction: 1 }
-  ];
-
-  vehicleConfigs.forEach(({ type, index, row, direction }) => {
-    const vehicle = type === 'car' ? Car(index, direction) : Truck(index, direction);
-    vehicle.position.y = row * LANE_HEIGHT;
-    vehicles.push(vehicle);
-    scene.add(vehicle);
-  });
-
-  // Controls
+  // Controls with collision callback
   setupControls(player, () => {
-    detectCollision(player, vehicles);
+    detectCollision(player, activeVehicles);
   });
 
   // Camera setup
-  camera.position.set(0, -300, 200);
+  camera.position.set(0, -200, 200); // Adjusted to better frame the player
   camera.lookAt(0, 0, 0);
   camera.updateProjectionMatrix();
 
@@ -68,21 +49,33 @@ export function initGame(container) {
   // Game loop
   function gameLoop() {
     const delta = clock.getDelta();
-    const speed = 20;
     const limit = 150;
+    const playerY = player.position.y;
 
-    vehicles.forEach(vehicle => {
-      moveVehicle(vehicle, speed, delta);
+    // Move and despawn vehicles far behind the player
+    for (let i = activeVehicles.length - 1; i >= 0; i--) {
+      const vehicle = activeVehicles[i];
+    
+      if (vehicle.position.y > playerY + 300) {
+        if (vehicle.parent) {
+          vehicle.parent.remove(vehicle);
+        }
+        activeVehicles.splice(i, 1);
+        continue;
+      }
+    
+      moveVehicle(vehicle, vehicle.userData.speed || 20, delta);
       resetVehiclePosition(vehicle, limit);
-    });
+    }
+    
 
     updateCamera(camera, player);
-    detectCollision(player, vehicles);
+    detectCollision(player, activeVehicles);
 
-    // Generate more rows as player moves forward
+    // Add new rows when player advances
     const playerRow = Math.floor(-player.position.y / LANE_HEIGHT);
     if (playerRow + 10 > maxRowGenerated) {
-      addRows(10); // Add 10 more rows
+      addRows(10);
       maxRowGenerated = metadata.length;
     }
 
@@ -90,5 +83,5 @@ export function initGame(container) {
     requestAnimationFrame(gameLoop);
   }
 
-  requestAnimationFrame(gameLoop);
+  gameLoop(); // Start the game loop
 }
