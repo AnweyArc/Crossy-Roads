@@ -1,8 +1,8 @@
 // map.js
 import * as THREE from "three";
 import { Car, Truck } from "./vehicles";
-import { Grass, Road, Tree } from "./terrain";
-import { generateRows } from "./gamemanager"; // or wherever you generate rows
+import { createGrass, createRoad, createTree } from "./terrain";
+import { generateRows } from "./rowGenerator.js";
 
 export const map = new THREE.Group();
 export const metadata = [];
@@ -12,7 +12,7 @@ export function initializeMap() {
   map.remove(...map.children);
 
   for (let rowIndex = 0; rowIndex > -10; rowIndex--) {
-    const grass = Grass(rowIndex);
+    const grass = createGrass(rowIndex);
     map.add(grass);
   }
 
@@ -28,15 +28,15 @@ export function addRows() {
     const rowIndex = startIndex + index + 1;
 
     if (rowData.type === "forest") {
-      const row = Grass(rowIndex);
+      const row = createGrass(rowIndex);
       rowData.trees.forEach(({ tileIndex, height }) => {
-        row.add(Tree(tileIndex, height));
+        row.add(createTree(tileIndex, height));
       });
       map.add(row);
     }
 
     if (rowData.type === "car") {
-      const row = Road(rowIndex);
+      const row = createRoad(rowIndex);
       rowData.vehicles.forEach((v) => {
         const car = Car(v.initialTileIndex, rowData.direction, v.color);
         v.ref = car;
@@ -46,7 +46,7 @@ export function addRows() {
     }
 
     if (rowData.type === "truck") {
-      const row = Road(rowIndex);
+      const row = createRoad(rowIndex);
       rowData.vehicles.forEach((v) => {
         const truck = Truck(v.initialTileIndex, rowData.direction, v.color);
         v.ref = truck;

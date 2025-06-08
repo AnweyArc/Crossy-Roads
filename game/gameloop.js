@@ -1,4 +1,4 @@
-import { moveVehicle } from './vehicles';
+import { moveVehicle, resetVehiclePosition } from './vehicles';
 import { updateCamera } from './camera';
 import { detectCollision } from './collision';
 
@@ -9,10 +9,16 @@ export const gameLoop = ({
     requestAnimationFrame(animate);
 
     const delta = clock.getDelta();
-    vehicles.forEach(v => moveVehicle(v, 2, delta, v.userData.type === 'car' ? -1 : 1));
-    updateCamera(camera, player);
+    const limit = 1000; // adjust this based on your scene width
 
+    vehicles.forEach(v => {
+      moveVehicle(v, 2, delta);
+      resetVehiclePosition(v, limit);
+    });
+
+    updateCamera(camera, player);
     detectCollision(player, vehicles);
+
     renderer.render(scene, camera);
   };
 

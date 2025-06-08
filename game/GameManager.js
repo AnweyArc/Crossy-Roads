@@ -3,10 +3,17 @@ import { createCamera } from './camera.js';
 import { createRenderer } from './renderer.js';
 import { createDirectionalLight, createAmbientLight } from './lighting.js';
 import { createPlayer } from './player.js';
-import { initializeMap } from './world.js';
+import { map, initializeMap } from './map.js';
 import { setupControls } from './controls.js';
 import { detectCollision } from './collision.js';
-import { Car, Truck, moveVehicle, resetVehiclePosition } from './vehicles.js';
+import {
+  Car,
+  Truck,
+  moveVehicle,
+  resetVehiclePosition,
+  TILE_SIZE,
+  LANE_HEIGHT
+} from './vehicles.js';
 
 export function initGame(container) {
   const scene = new THREE.Scene();
@@ -25,7 +32,8 @@ export function initGame(container) {
   scene.add(player);
 
   // World terrain
-  initializeMap(scene);
+  initializeMap();         // initialize the map group
+  scene.add(map);
 
   // Vehicles
   const vehicles = [];
@@ -38,8 +46,7 @@ export function initGame(container) {
 
   vehicleConfigs.forEach(({ type, index, row, direction }) => {
     const vehicle = type === 'car' ? Car(index, direction) : Truck(index, direction);
-    vehicle.position.y = row * 42;
-    vehicle.userData = { direction };
+    vehicle.position.y = row * LANE_HEIGHT;
     vehicles.push(vehicle);
     scene.add(vehicle);
   });

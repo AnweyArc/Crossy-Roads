@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-const tileSize = 42;
-const LANE_HEIGHT = 42;
+export const TILE_SIZE = 42;
+export const LANE_HEIGHT = 42;
 
 // Helper to generate canvas-based textures
 function Texture(width, height, rects) {
@@ -42,7 +42,7 @@ function Wheel(xOffset) {
   const material = new THREE.MeshBasicMaterial({ color: 0x333333 });
   const wheel = new THREE.Mesh(geometry, material);
   wheel.rotation.x = Math.PI / 2;
-  wheel.position.z = 5;
+  wheel.position.z = 8;
   wheel.position.x = xOffset;
   return wheel;
 }
@@ -50,7 +50,7 @@ function Wheel(xOffset) {
 // Car constructor
 export function Car(initialTileIndex, direction = 1, color = 0xff0000) {
   const car = new THREE.Group();
-  car.position.x = initialTileIndex * tileSize;
+  car.position.x = initialTileIndex * TILE_SIZE;
   if (direction < 0) car.rotation.z = Math.PI;
 
   const main = new THREE.Mesh(
@@ -63,26 +63,10 @@ export function Car(initialTileIndex, direction = 1, color = 0xff0000) {
   car.add(main);
 
   const cabin = new THREE.Mesh(new THREE.BoxGeometry(33, 24, 12), [
-    new THREE.MeshPhongMaterial({
-      color: 0xcccccc,
-      flatShading: true,
-      map: carBackTexture,
-    }),
-    new THREE.MeshPhongMaterial({
-      color: 0xcccccc,
-      flatShading: true,
-      map: carFrontTexture,
-    }),
-    new THREE.MeshPhongMaterial({
-      color: 0xcccccc,
-      flatShading: true,
-      map: carRightSideTexture,
-    }),
-    new THREE.MeshPhongMaterial({
-      color: 0xcccccc,
-      flatShading: true,
-      map: carLeftSideTexture,
-    }),
+    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carBackTexture }),
+    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carFrontTexture }),
+    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carRightSideTexture }),
+    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carLeftSideTexture }),
     new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true }), // top
     new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true }), // bottom
   ]);
@@ -95,13 +79,15 @@ export function Car(initialTileIndex, direction = 1, color = 0xff0000) {
   car.add(Wheel(18));
   car.add(Wheel(-18));
 
+  car.userData = { type: 'car', direction };
+
   return car;
 }
 
 // Truck constructor
 export function Truck(initialTileIndex, direction = 1, color = 0x0000ff) {
   const truck = new THREE.Group();
-  truck.position.x = initialTileIndex * tileSize;
+  truck.position.x = initialTileIndex * TILE_SIZE;
   if (direction < 0) truck.rotation.z = Math.PI;
 
   const base = new THREE.Mesh(
@@ -112,26 +98,10 @@ export function Truck(initialTileIndex, direction = 1, color = 0x0000ff) {
   truck.add(base);
 
   const cabin = new THREE.Mesh(new THREE.BoxGeometry(33, 24, 12), [
-    new THREE.MeshPhongMaterial({
-      color: 0x888888,
-      flatShading: true,
-      map: truckBackTexture,
-    }),
-    new THREE.MeshPhongMaterial({
-      color: 0x888888,
-      flatShading: true,
-      map: truckFrontTexture,
-    }),
-    new THREE.MeshPhongMaterial({
-      color: 0x888888,
-      flatShading: true,
-      map: truckRightSideTexture,
-    }),
-    new THREE.MeshPhongMaterial({
-      color: 0x888888,
-      flatShading: true,
-      map: truckLeftSideTexture,
-    }),
+    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: truckBackTexture }),
+    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: truckFrontTexture }),
+    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: truckRightSideTexture }),
+    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: truckLeftSideTexture }),
     new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true }), // top
     new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true }), // bottom
   ]);
@@ -142,25 +112,10 @@ export function Truck(initialTileIndex, direction = 1, color = 0x0000ff) {
   truck.add(Wheel(25));
   truck.add(Wheel(-25));
 
+  truck.userData = { type: 'truck', direction };
+
   return truck;
 }
-
-// Legacy function for generic vehicle spawning
-export const spawnVehicle = (type, laneIndex, lanePosition, direction = 1) => {
-  const length = type === 'truck' ? 3 : 2;
-  const color = type === 'truck' ? 0x0000ff : 0xff0000;
-
-  const vehicle = new THREE.Mesh(
-    new THREE.BoxGeometry(length * 10, 4, 4),
-    new THREE.MeshLambertMaterial({ color })
-  );
-
-  vehicle.position.set(lanePosition, laneIndex * LANE_HEIGHT, 2);
-  vehicle.userData = { type, direction };
-  vehicle.castShadow = true;
-  vehicle.receiveShadow = true;
-  return vehicle;
-};
 
 // Movement functions
 export const moveVehicle = (vehicle, speed, delta) => {
