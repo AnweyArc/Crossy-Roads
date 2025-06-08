@@ -34,16 +34,16 @@ export function addRows(count = 10) {
       row.position.y = rowIndex * LANE_HEIGHT;
 
       rowData.vehicles.forEach((v) => {
-        const car = Car(v.initialTileIndex, rowData.direction, v.color);
-        car.userData.speed = Math.random() * 2 + 2; // Random speed between 2 and 4
-
-        // Make sure vehicle's Y matches the row's Y
-        car.position.y = 0; // relative to row group
-
+        const speed = Math.random() * 2 + 6;
+        const randomTileIndex = Math.floor(Math.random() * 20) - 10; // -10 to 9
+        const car = Car(randomTileIndex, rowData.direction, speed, v.color);
+        car.position.y = 0;
+      
         v.ref = car;
         activeVehicles.push(car);
         row.add(car);
       });
+      
       map.add(row);
     }
 
@@ -54,16 +54,16 @@ export function addRows(count = 10) {
       row.position.y = rowIndex * LANE_HEIGHT;
 
       rowData.vehicles.forEach((v) => {
-        const truck = Truck(v.initialTileIndex, rowData.direction, v.color);
-        truck.userData.speed = Math.random() * 1.5 + 1.5; // Random speed between 1.5 and 3
-
-        // Make sure vehicle's Y matches the row's Y
-        truck.position.y = 0; // relative to row group
-
+        const speed = Math.random() * 1.5 + 1.5;
+        const randomTileIndex = Math.floor(Math.random() * 20) - 10; // -10 to 9
+        const truck = Truck(randomTileIndex, rowData.direction, speed, v.color);
+        truck.position.y = 0;
+      
         v.ref = truck;
         activeVehicles.push(truck);
         row.add(truck);
       });
+      
       map.add(row);
     }
 
