@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import { createCamera } from './camera.js';
+import { createCamera, updateCamera } from './camera.js';
 import { createRenderer } from './renderer.js';
 import { createDirectionalLight, createAmbientLight } from './lighting.js';
 import { createPlayer } from './player.js';
-import { map, initializeMap } from './map.js';
+import { map, initializeMap, addRows, metadata } from './map.js';
 import { setupControls } from './controls.js';
 import { detectCollision } from './collision.js';
 import {
@@ -21,6 +21,7 @@ export function initGame(container) {
   // Camera & Renderer
   const camera = createCamera();
   const renderer = createRenderer(container);
+  const clock = new THREE.Clock();
 
   // Lighting
   const directionalLight = createDirectionalLight();
@@ -32,7 +33,7 @@ export function initGame(container) {
   scene.add(player);
 
   // World terrain
-  initializeMap();         // initialize the map group
+  initializeMap();
   scene.add(map);
 
   // Vehicles
@@ -61,13 +62,12 @@ export function initGame(container) {
   camera.lookAt(0, 0, 0);
   camera.updateProjectionMatrix();
 
+  // Endless logic
+  let maxRowGenerated = metadata.length;
+
   // Game loop
-  let lastTime = 0;
-
-  function gameLoop(time = 0) {
-    const delta = (time - lastTime) * 0.001; // convert ms to seconds
-    lastTime = time;
-
+  function gameLoop() {
+    const delta = clock.getDelta();
     const speed = 20;
     const limit = 150;
 
@@ -76,10 +76,19 @@ export function initGame(container) {
       resetVehiclePosition(vehicle, limit);
     });
 
+    updateCamera(camera, player);
+    detectCollision(player, vehicles);
+
+    // Generate more rows as player moves forward
+    const playerRow = Math.floor(-player.position.y / LANE_HEIGHT);
+    if (playerRow + 10 > maxRowGenerated) {
+      addRows(10); // Add 10 more rows
+      maxRowGenerated = metadata.length;
+    }
+
     renderer.render(scene, camera);
     requestAnimationFrame(gameLoop);
   }
 
   requestAnimationFrame(gameLoop);
-
 }

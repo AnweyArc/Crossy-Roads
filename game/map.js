@@ -1,4 +1,3 @@
-// map.js
 import * as THREE from "three";
 import { Car, Truck } from "./vehicles";
 import { createGrass, createRoad, createTree } from "./terrain";
@@ -9,23 +8,23 @@ export const metadata = [];
 
 export function initializeMap() {
   metadata.length = 0;
-  map.remove(...map.children);
+  map.clear();
 
   for (let rowIndex = 0; rowIndex > -10; rowIndex--) {
     const grass = createGrass(rowIndex);
     map.add(grass);
   }
 
-  addRows();
+  addRows(20); // initial rows
 }
 
-export function addRows() {
-  const newMetadata = generateRows(20);
+export function addRows(count = 10) {
+  const newMetadata = generateRows(count);
   const startIndex = metadata.length;
   metadata.push(...newMetadata);
 
   newMetadata.forEach((rowData, index) => {
-    const rowIndex = startIndex + index + 1;
+    const rowIndex = -1 * (startIndex + index);
 
     if (rowData.type === "forest") {
       const row = createGrass(rowIndex);
@@ -35,22 +34,15 @@ export function addRows() {
       map.add(row);
     }
 
-    if (rowData.type === "car") {
+    if (rowData.type === "car" || rowData.type === "truck") {
       const row = createRoad(rowIndex);
       rowData.vehicles.forEach((v) => {
-        const car = Car(v.initialTileIndex, rowData.direction, v.color);
-        v.ref = car;
-        row.add(car);
-      });
-      map.add(row);
-    }
-
-    if (rowData.type === "truck") {
-      const row = createRoad(rowIndex);
-      rowData.vehicles.forEach((v) => {
-        const truck = Truck(v.initialTileIndex, rowData.direction, v.color);
-        v.ref = truck;
-        row.add(truck);
+        const vehicle =
+          rowData.type === "car"
+            ? Car(v.initialTileIndex, rowData.direction, v.color)
+            : Truck(v.initialTileIndex, rowData.direction, v.color);
+        v.ref = vehicle;
+        row.add(vehicle);
       });
       map.add(row);
     }

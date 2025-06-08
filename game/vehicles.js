@@ -131,3 +131,16 @@ export const resetVehiclePosition = (vehicle, limit) => {
     vehicle.position.x = limit;
   }
 };
+
+export function collectVehiclesFromMap(mapGroup) {
+  const vehicles = [];
+  mapGroup.children.forEach(row => {
+    row.children.forEach(object => {
+      if (object.userData?.type === 'car' || object.userData?.type === 'truck') {
+        vehicles.push(object);
+      }
+    });
+  });
+  return vehicles;
+}
+
