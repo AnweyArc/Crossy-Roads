@@ -1,22 +1,31 @@
-const THREE = require('three');
+import { movePlayer } from './player.js';
 
 export function setupControls(player, collisionCallback) {
   window.addEventListener('keydown', (event) => {
-    const step = 10;
+    let moved = false;
+
     switch (event.key) {
       case 'ArrowUp':
-        player.position.y += step;
+        movePlayer(player, 'up');
+        moved = true;
         break;
       case 'ArrowDown':
-        player.position.y -= step;
+        movePlayer(player, 'down');
+        moved = true;
         break;
       case 'ArrowLeft':
-        player.position.x -= step;
+        movePlayer(player, 'left');
+        moved = true;
         break;
       case 'ArrowRight':
-        player.position.x += step;
+        movePlayer(player, 'right');
+        moved = true;
         break;
     }
-    if (collisionCallback) collisionCallback();
+
+    // Only check collision if a move was attempted
+    if (moved && collisionCallback) {
+      collisionCallback();
+    }
   });
 }

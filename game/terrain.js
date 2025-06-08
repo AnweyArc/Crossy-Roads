@@ -43,6 +43,8 @@ export function createRoad(rowIndex) {
 export function createTree(tileIndex, height = 30) {
   const tree = new THREE.Group();
   tree.position.x = tileIndex * tileSize;
+  tree.position.z = 1; // ensures trees render above ground
+
 
   // Trunk
   const trunk = new THREE.Mesh(

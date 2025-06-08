@@ -6,6 +6,10 @@ import { generateRows } from "./rowGenerator.js";
 export const map = new THREE.Group();
 export const metadata = [];
 export const activeVehicles = [];
+export const treeObstacles = []; // stores { x, y } positions of trees
+export const blockedTiles = new Set(); // Store "x,y" strings
+
+
 
 export function initializeMap() {
   metadata.length = 0;
@@ -70,12 +74,24 @@ export function addRows(count = 10) {
     if (rowData.type === "forest") {
       const row = createGrass(rowIndex);
       row.position.y = rowIndex * LANE_HEIGHT;
-
-      rowData.trees.forEach((tileIndex) => {
-        const tree = createTree(tileIndex);
+    
+      rowData.trees.forEach(({ tileIndex, height }) => {
+        const tree = createTree(tileIndex, height);
+        tree.position.y = 0; // Make sure it's grounded
         row.add(tree);
+    
+        // 🟢 Record tree tile world position
+        treeObstacles.push({
+          x: tileIndex * TILE_SIZE,
+          y: rowIndex * LANE_HEIGHT
+        });
+    
+        // Optional: Blocked tile key if needed elsewhere
+        const key = `${tileIndex},${rowIndex}`;
+        blockedTiles.add(key);
       });
+    
       map.add(row);
-    }
+    } 
   });
 }

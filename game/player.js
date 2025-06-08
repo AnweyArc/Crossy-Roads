@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { tileSize } from "./constants.js";
+import { treeObstacles } from "./map.js"; // Import obstacle list
 import { onPlayerMove } from './collision.js'; // Import movement tracker
 
 export function createPlayer() {
@@ -26,20 +27,39 @@ export function createPlayer() {
 export function movePlayer(player, direction) {
   const moveDistance = tileSize;
 
+  // Calculate proposed new position
+  const newPos = player.position.clone();
   switch (direction) {
     case 'up':
-      player.position.y += moveDistance;
+      newPos.y += moveDistance;
       break;
     case 'down':
-      player.position.y -= moveDistance;
+      newPos.y -= moveDistance;
       break;
     case 'left':
-      player.position.x -= moveDistance;
+      newPos.x -= moveDistance;
       break;
     case 'right':
-      player.position.x += moveDistance;
+      newPos.x += moveDistance;
       break;
   }
 
-  onPlayerMove(); // Notify collision system that the player has moved
+  // Check for tree obstacle at new tile
+  const newTileX = Math.round(newPos.x / tileSize);
+  const newTileY = Math.round(newPos.y / tileSize);
+
+  const blocked = treeObstacles.some(ob => {
+    const obTileX = Math.round(ob.x / tileSize);
+    const obTileY = Math.round(ob.y / tileSize);
+    return obTileX === newTileX && obTileY === newTileY;
+  });
+
+  if (blocked) {
+    console.log("Blocked by tree!");
+    return;
+  }
+
+  player.position.copy(newPos);
+  onPlayerMove();
 }
+
