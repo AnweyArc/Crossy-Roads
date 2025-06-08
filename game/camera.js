@@ -11,9 +11,10 @@ export function createCamera() {
     width / 2,
     height / 2,
     height / -2,
-    1,     // near plane closer to 1
-    1000   // far plane far away
+    1,
+    5000    // or even 10000, if your map is endless
   );
+  
 
   camera.up.set(0, 0, 1);
   camera.position.set(300, -300, 300);

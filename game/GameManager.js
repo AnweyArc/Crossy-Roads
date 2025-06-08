@@ -56,10 +56,8 @@ export function initGame(container) {
     for (let i = activeVehicles.length - 1; i >= 0; i--) {
       const vehicle = activeVehicles[i];
     
-      if (vehicle.position.y > playerY + 300) {
-        if (vehicle.parent) {
-          vehicle.parent.remove(vehicle);
-        }
+      if (vehicle.position.y < playerY - 300) {
+        vehicle.parent?.remove(vehicle);
         activeVehicles.splice(i, 1);
         continue;
       }
