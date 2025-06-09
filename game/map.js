@@ -33,43 +33,40 @@ export function addRows(count = 10) {
 
     if (rowData.type === "car") {
       const row = createRoad(rowIndex);
-      
-      // Set Y position of the road row group to align vehicles properly
       row.position.y = rowIndex * LANE_HEIGHT;
-
+    
       rowData.vehicles.forEach((v) => {
-        const speed = Math.random() * 2 + 6;
-        const randomTileIndex = Math.floor(Math.random() * 20) - 10; // -10 to 9
+        const speed = Math.random() * 40 + 5; // ⬅️ Updated car speed (5 to 15)
+        const randomTileIndex = Math.floor(Math.random() * 20) - 10;
         const car = Car(randomTileIndex, rowData.direction, speed, v.color);
         car.position.y = 0;
-      
+    
         v.ref = car;
         activeVehicles.push(car);
         row.add(car);
       });
-      
+    
       map.add(row);
     }
-
+    
     if (rowData.type === "truck") {
       const row = createRoad(rowIndex);
-
-      // Set Y position of the road row group to align vehicles properly
       row.position.y = rowIndex * LANE_HEIGHT;
-
+    
       rowData.vehicles.forEach((v) => {
-        const speed = Math.random() * 1.5 + 1.5;
-        const randomTileIndex = Math.floor(Math.random() * 20) - 10; // -10 to 9
+        const speed = Math.random() * 50 + 2; // ⬅️ Updated truck speed (2 to 8)
+        const randomTileIndex = Math.floor(Math.random() * 20) - 10;
         const truck = Truck(randomTileIndex, rowData.direction, speed, v.color);
         truck.position.y = 0;
-      
+    
         v.ref = truck;
         activeVehicles.push(truck);
         row.add(truck);
       });
-      
+    
       map.add(row);
     }
+    
 
     if (rowData.type === "forest") {
       const row = createGrass(rowIndex);
