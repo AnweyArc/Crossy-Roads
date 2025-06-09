@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { getScore } from './score.js';
 
 let gameStartTime = Date.now();
 let playerHasMoved = false;
@@ -24,17 +25,13 @@ export function detectCollision(player, vehicles) {
     const vehicleBox = new THREE.Box3().setFromObject(vehicle);
     if (playerBox.intersectsBox(vehicleBox)) {
       gameOver = true;
-      showGameOverModal();
+      showGameOverModal(getScore());
       break;
     }
   }
 }
 
-function showGameOverModal() {
-  // Calculate score as time survived (seconds)
-  const scoreSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
-
-  // Create overlay container
+function showGameOverModal(score) {
   const overlay = document.createElement('div');
   overlay.style.position = 'fixed';
   overlay.style.top = 0;
@@ -49,7 +46,6 @@ function showGameOverModal() {
   overlay.style.zIndex = 9999;
   document.body.appendChild(overlay);
 
-  // Create modal box
   const modal = document.createElement('div');
   modal.style.background = '#222';
   modal.style.borderRadius = '12px';
@@ -61,26 +57,22 @@ function showGameOverModal() {
   modal.style.minWidth = '320px';
   overlay.appendChild(modal);
 
-  // Title
   const title = document.createElement('h2');
   title.innerText = 'Game Over';
   title.style.marginBottom = '20px';
   modal.appendChild(title);
 
-  // Score
   const scoreText = document.createElement('p');
-  scoreText.innerText = `Your score: ${scoreSeconds} seconds`;
+  scoreText.innerText = `Your score: ${score} rows passed`;
   scoreText.style.fontSize = '1.2rem';
   scoreText.style.marginBottom = '30px';
   modal.appendChild(scoreText);
 
-  // Buttons container
   const btnContainer = document.createElement('div');
   btnContainer.style.display = 'flex';
   btnContainer.style.justifyContent = 'space-around';
   modal.appendChild(btnContainer);
 
-  // Retry button
   const retryBtn = document.createElement('button');
   retryBtn.innerText = 'Retry';
   retryBtn.style.padding = '12px 25px';
@@ -97,7 +89,6 @@ function showGameOverModal() {
   };
   btnContainer.appendChild(retryBtn);
 
-  // Go Back button
   const backBtn = document.createElement('button');
   backBtn.innerText = 'Go Back';
   backBtn.style.padding = '12px 25px';
@@ -109,8 +100,7 @@ function showGameOverModal() {
   backBtn.style.fontSize = '1rem';
   backBtn.style.cursor = 'pointer';
   backBtn.onclick = () => {
-    // Adjust this if you use a router, for now simple redirect:
-    window.location.href = '/GamePages/home'; 
+    window.location.href = '/GamePages/home';
   };
   btnContainer.appendChild(backBtn);
 }

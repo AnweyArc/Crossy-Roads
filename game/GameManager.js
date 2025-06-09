@@ -11,6 +11,7 @@ import {
   resetVehiclePosition,
   LANE_HEIGHT
 } from './vehicles.js';
+import { incrementScore, resetScore } from './score.js';
 
 export function initGame(container) {
   const scene = new THREE.Scene();
@@ -45,6 +46,8 @@ export function initGame(container) {
 
   // Endless logic
   let maxRowGenerated = metadata.length;
+  let lastScoredRow = 0;
+  resetScore();
 
   // Game loop
   function gameLoop() {
@@ -55,17 +58,23 @@ export function initGame(container) {
     // Move and despawn vehicles far behind the player
     for (let i = activeVehicles.length - 1; i >= 0; i--) {
       const vehicle = activeVehicles[i];
-    
+
       if (vehicle.position.y < playerY - 300) {
         vehicle.parent?.remove(vehicle);
         activeVehicles.splice(i, 1);
         continue;
       }
-    
+
       moveVehicle(vehicle, vehicle.userData.speed || 20, delta);
       resetVehiclePosition(vehicle, limit);
     }
-    
+
+    // ✅ Scoring based on row passed
+    const currentRow = Math.floor(-playerY / LANE_HEIGHT);
+    if (currentRow > lastScoredRow) {
+      incrementScore();
+      lastScoredRow = currentRow;
+    }
 
     updateCamera(camera, player);
     detectCollision(player, activeVehicles);
