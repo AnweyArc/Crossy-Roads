@@ -2,6 +2,8 @@ import * as THREE from 'three';
 
 export const TILE_SIZE = 42;
 export const LANE_HEIGHT = 42;
+export const MIN_TILE_INDEX = -10; // ✅ Added
+export const MAX_TILE_INDEX = 9;   // ✅ Added
 
 // Helper to generate canvas-based textures
 function Texture(width, height, rects) {
@@ -39,8 +41,8 @@ const truckLeftSideTexture = Texture(25, 30, [{ x: 15, y: 15, w: 10, h: 10 }]);
 // Wheel generator
 function Wheel(xOffset) {
   const geometry = new THREE.CylinderGeometry(5, 5, 2, 16);
-  geometry.computeBoundingBox(); // Ensure bounding box is computed
-  geometry.computeBoundingSphere(); // Avoid NaN error
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
 
   const material = new THREE.MeshBasicMaterial({ color: 0x333333 });
   const wheel = new THREE.Mesh(geometry, material);
@@ -49,7 +51,6 @@ function Wheel(xOffset) {
   wheel.position.x = xOffset;
   return wheel;
 }
-
 
 // Car constructor
 export function Car(initialTileIndex, direction = 1, speed = 20, color = 0xff0000) {
@@ -75,8 +76,8 @@ export function Car(initialTileIndex, direction = 1, speed = 20, color = 0xff000
     new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carFrontTexture }),
     new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carRightSideTexture }),
     new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carLeftSideTexture }),
-    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true }), // top
-    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true }), // bottom
+    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true }),
+    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true }),
   ]);
   cabin.position.x = -6;
   cabin.position.z = 25.5;
@@ -114,8 +115,8 @@ export function Truck(initialTileIndex, direction = 1, speed = 20, color = 0x000
     new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: truckFrontTexture }),
     new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: truckRightSideTexture }),
     new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: truckLeftSideTexture }),
-    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true }), // top
-    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true }), // bottom
+    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true }),
+    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true }),
   ]);
   cabin.position.x = -30;
   cabin.position.z = 25.5;

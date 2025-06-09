@@ -6,10 +6,8 @@ import { generateRows } from "./rowGenerator.js";
 export const map = new THREE.Group();
 export const metadata = [];
 export const activeVehicles = [];
-export const treeObstacles = []; // stores { x, y } positions of trees
-export const blockedTiles = new Set(); // Store "x,y" strings
-
-
+export const treeObstacles = [];
+export const blockedTiles = new Set();
 
 export function initializeMap() {
   metadata.length = 0;
@@ -31,64 +29,81 @@ export function addRows(count = 10) {
   newMetadata.forEach((rowData, index) => {
     const rowIndex = -1 * (startIndex + index);
 
-    if (rowData.type === "car") {
-      const row = createRoad(rowIndex);
-      row.position.y = rowIndex * LANE_HEIGHT;
-    
-      rowData.vehicles.forEach((v) => {
-        const speed = Math.random() * 40 + 5; // ⬅️ Updated car speed (5 to 15)
-        const randomTileIndex = Math.floor(Math.random() * 20) - 10;
-        const car = Car(randomTileIndex, rowData.direction, speed, v.color);
-        car.position.y = 0;
-    
-        v.ref = car;
-        activeVehicles.push(car);
-        row.add(car);
-      });
-    
-      map.add(row);
-    }
-    
-    if (rowData.type === "truck") {
-      const row = createRoad(rowIndex);
-      row.position.y = rowIndex * LANE_HEIGHT;
-    
-      rowData.vehicles.forEach((v) => {
-        const speed = Math.random() * 50 + 2; // ⬅️ Updated truck speed (2 to 8)
-        const randomTileIndex = Math.floor(Math.random() * 20) - 10;
-        const truck = Truck(randomTileIndex, rowData.direction, speed, v.color);
-        truck.position.y = 0;
-    
-        v.ref = truck;
-        activeVehicles.push(truck);
-        row.add(truck);
-      });
-    
-      map.add(row);
-    }
-    
+    // Shared: create left and right boundary trees/walls
+    function addBoundaryWalls(rowGroup) {
+      [-10, 9].forEach((tileIndex) => {
+        const wall = createTree(tileIndex, 1.2); // You can replace with a custom `createWall()` if preferred
+        wall.position.y = 0;
+        rowGroup.add(wall);
 
-    if (rowData.type === "forest") {
-      const row = createGrass(rowIndex);
-      row.position.y = rowIndex * LANE_HEIGHT;
-    
-      rowData.trees.forEach(({ tileIndex, height }) => {
-        const tree = createTree(tileIndex, height);
-        tree.position.y = 0; // Make sure it's grounded
-        row.add(tree);
-    
-        // 🟢 Record tree tile world position
         treeObstacles.push({
           x: tileIndex * TILE_SIZE,
           y: rowIndex * LANE_HEIGHT
         });
-    
-        // Optional: Blocked tile key if needed elsewhere
+
         const key = `${tileIndex},${rowIndex}`;
         blockedTiles.add(key);
       });
-    
+    }
+
+    if (rowData.type === "car") {
+      const row = createRoad(rowIndex);
+      row.position.y = rowIndex * LANE_HEIGHT;
+
+      rowData.vehicles.forEach((v) => {
+        const speed = Math.random() * 40 + 5;
+        const randomTileIndex = Math.floor(Math.random() * 20) - 10;
+        const car = Car(randomTileIndex, rowData.direction, speed, v.color);
+        car.position.y = 0;
+
+        v.ref = car;
+        activeVehicles.push(car);
+        row.add(car);
+      });
+
+      addBoundaryWalls(row); // ✅ add side blockers
       map.add(row);
-    } 
+    }
+
+    if (rowData.type === "truck") {
+      const row = createRoad(rowIndex);
+      row.position.y = rowIndex * LANE_HEIGHT;
+
+      rowData.vehicles.forEach((v) => {
+        const speed = Math.random() * 50 + 2;
+        const randomTileIndex = Math.floor(Math.random() * 20) - 10;
+        const truck = Truck(randomTileIndex, rowData.direction, speed, v.color);
+        truck.position.y = 0;
+
+        v.ref = truck;
+        activeVehicles.push(truck);
+        row.add(truck);
+      });
+
+      addBoundaryWalls(row); // ✅ add side blockers
+      map.add(row);
+    }
+
+    if (rowData.type === "forest") {
+      const row = createGrass(rowIndex);
+      row.position.y = rowIndex * LANE_HEIGHT;
+
+      rowData.trees.forEach(({ tileIndex, height }) => {
+        const tree = createTree(tileIndex, height);
+        tree.position.y = 0;
+        row.add(tree);
+
+        treeObstacles.push({
+          x: tileIndex * TILE_SIZE,
+          y: rowIndex * LANE_HEIGHT
+        });
+
+        const key = `${tileIndex},${rowIndex}`;
+        blockedTiles.add(key);
+      });
+
+      addBoundaryWalls(row); // ✅ add side blockers
+      map.add(row);
+    }
   });
 }
