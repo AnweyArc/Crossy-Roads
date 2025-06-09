@@ -11,7 +11,7 @@ import {
   resetVehiclePosition,
   LANE_HEIGHT
 } from './vehicles.js';
-import { incrementScore, resetScore } from './score.js';
+import { incrementScore, resetScore, onScoreChange } from './score.js'; // ✅ Include onScoreChange
 
 export function initGame(container) {
   const scene = new THREE.Scene();
@@ -48,6 +48,14 @@ export function initGame(container) {
   let maxRowGenerated = metadata.length;
   let lastScoredRow = 0;
   resetScore();
+
+  // ✅ Update score display in UI
+  onScoreChange((score) => {
+    const scoreEl = document.getElementById('score');
+    if (scoreEl) {
+      scoreEl.textContent = score;
+    }
+  });
 
   // Game loop
   function gameLoop() {
