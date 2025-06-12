@@ -1,44 +1,16 @@
 import * as THREE from 'three';
+import {
+  carFrontTexture, carBackTexture, carRightSideTexture, carLeftSideTexture,
+  truckFrontTexture, truckBackTexture, truckRightSideTexture, truckLeftSideTexture,
+  goldenCarFrontTexture, goldenCarBackTexture, goldenCarRightSideTexture, goldenCarLeftSideTexture,
+  goldenTruckFrontTexture, goldenTruckBackTexture, goldenTruckRightSideTexture, goldenTruckLeftSideTexture
+} from './textures';
 
 export const TILE_SIZE = 42;
 export const LANE_HEIGHT = 42;
-export const MIN_TILE_INDEX = -10; // ✅ Added
-export const MAX_TILE_INDEX = 9;   // ✅ Added
+export const MIN_TILE_INDEX = -10;
+export const MAX_TILE_INDEX = 9;
 
-// Helper to generate canvas-based textures
-function Texture(width, height, rects) {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext("2d");
-  context.fillStyle = "#ffffff";
-  context.fillRect(0, 0, width, height);
-  context.fillStyle = "rgba(0,0,0,0.6)";
-  rects.forEach((rect) => {
-    context.fillRect(rect.x, rect.y, rect.w, rect.h);
-  });
-  return new THREE.CanvasTexture(canvas);
-}
-
-// Car textures
-const carFrontTexture = Texture(40, 80, [{ x: 0, y: 10, w: 30, h: 60 }]);
-const carBackTexture = Texture(40, 80, [{ x: 10, y: 10, w: 30, h: 60 }]);
-const carRightSideTexture = Texture(110, 40, [
-  { x: 10, y: 0, w: 50, h: 30 },
-  { x: 70, y: 0, w: 30, h: 30 },
-]);
-const carLeftSideTexture = Texture(110, 40, [
-  { x: 10, y: 10, w: 50, h: 30 },
-  { x: 70, y: 10, w: 30, h: 30 },
-]);
-
-// Truck textures
-const truckFrontTexture = Texture(30, 30, [{ x: 5, y: 0, w: 10, h: 30 }]);
-const truckBackTexture = Texture(30, 30, [{ x: 5, y: 0, w: 10, h: 30 }]);
-const truckRightSideTexture = Texture(25, 30, [{ x: 15, y: 5, w: 10, h: 10 }]);
-const truckLeftSideTexture = Texture(25, 30, [{ x: 15, y: 15, w: 10, h: 10 }]);
-
-// Wheel generator
 function Wheel(xOffset) {
   const geometry = new THREE.CylinderGeometry(5, 5, 2, 16);
   geometry.computeBoundingBox();
@@ -52,8 +24,7 @@ function Wheel(xOffset) {
   return wheel;
 }
 
-// Car constructor
-export function Car(initialTileIndex, direction = 1, speed = 20, color = 0xff0000) {
+export function Car(initialTileIndex, direction = 1, speed = 20, color = 0xff0000, textures = {}) {
   const car = new THREE.Group();
   car.position.x = initialTileIndex * TILE_SIZE;
   if (direction < 0) car.rotation.z = Math.PI;
@@ -72,10 +43,10 @@ export function Car(initialTileIndex, direction = 1, speed = 20, color = 0xff000
   const cabinGeometry = new THREE.BoxGeometry(33, 24, 12);
   cabinGeometry.computeBoundingSphere();
   const cabin = new THREE.Mesh(cabinGeometry, [
-    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carBackTexture }),
-    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carFrontTexture }),
-    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carRightSideTexture }),
-    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carLeftSideTexture }),
+    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: textures.back || carBackTexture }),
+    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: textures.front || carFrontTexture }),
+    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: textures.right || carRightSideTexture }),
+    new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: textures.left || carLeftSideTexture }),
     new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true }),
     new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true }),
   ]);
@@ -93,8 +64,7 @@ export function Car(initialTileIndex, direction = 1, speed = 20, color = 0xff000
   return car;
 }
 
-// Truck constructor
-export function Truck(initialTileIndex, direction = 1, speed = 20, color = 0x0000ff) {
+export function Truck(initialTileIndex, direction = 1, speed = 20, color = 0x0000ff, textures = {}) {
   const truck = new THREE.Group();
   truck.position.x = initialTileIndex * TILE_SIZE;
   if (direction < 0) truck.rotation.z = Math.PI;
@@ -111,10 +81,10 @@ export function Truck(initialTileIndex, direction = 1, speed = 20, color = 0x000
   const cabinGeometry = new THREE.BoxGeometry(33, 24, 12);
   cabinGeometry.computeBoundingSphere();
   const cabin = new THREE.Mesh(cabinGeometry, [
-    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: truckBackTexture }),
-    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: truckFrontTexture }),
-    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: truckRightSideTexture }),
-    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: truckLeftSideTexture }),
+    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: textures.back || truckBackTexture }),
+    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: textures.front || truckFrontTexture }),
+    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: textures.right || truckRightSideTexture }),
+    new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true, map: textures.left || truckLeftSideTexture }),
     new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true }),
     new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true }),
   ]);
@@ -130,7 +100,6 @@ export function Truck(initialTileIndex, direction = 1, speed = 20, color = 0x000
   return truck;
 }
 
-// Movement functions
 export const moveVehicle = (vehicle, baseSpeed, delta) => {
   const dir = vehicle.userData.direction || 1;
   const speed = vehicle.userData.speed ?? baseSpeed;
@@ -150,10 +119,36 @@ export function collectVehiclesFromMap(mapGroup) {
   const vehicles = [];
   mapGroup.children.forEach(row => {
     row.children.forEach(object => {
-      if (object.userData?.type === 'car' || object.userData?.type === 'truck') {
+      if (object.userData?.type === 'car' || object.userData?.type === 'truck' || object.userData?.type?.startsWith('golden')) {
         vehicles.push(object);
       }
     });
   });
   return vehicles;
+}
+
+export function GoldenCar(initialTileIndex, direction = 1, speed = 30) {
+  const textures = {
+    front: goldenCarFrontTexture,
+    back: goldenCarBackTexture,
+    left: goldenCarLeftSideTexture,
+    right: goldenCarRightSideTexture,
+  };
+  const car = Car(initialTileIndex, direction, speed, 0xffd700, textures);
+  car.userData.isGolden = true;
+  car.userData.type = 'golden_car';
+  return car;
+}
+
+export function GoldenTruck(initialTileIndex, direction = 1, speed = 35) {
+  const textures = {
+    front: goldenTruckFrontTexture,
+    back: goldenTruckBackTexture,
+    left: goldenTruckLeftSideTexture,
+    right: goldenTruckRightSideTexture,
+  };
+  const truck = Truck(initialTileIndex, direction, speed, 0xffa500, textures);
+  truck.userData.isGolden = true;
+  truck.userData.type = 'golden_truck';
+  return truck;
 }

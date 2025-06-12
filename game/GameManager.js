@@ -6,12 +6,14 @@ import { createPlayer } from './player.js';
 import { map, initializeMap, addRows, metadata, activeVehicles } from './map.js';
 import { setupControls } from './controls.js';
 import { detectCollision } from './collision.js';
+import { spinCoins } from './coins.js'; // ⬅️ Add this line
 import {
   moveVehicle,
   resetVehiclePosition,
   LANE_HEIGHT
 } from './vehicles.js';
-import { incrementScore, resetScore, onScoreChange } from './score.js'; // ✅ Include onScoreChange
+import { incrementScore, resetScore, onScoreChange } from './score.js';
+import { checkCoinPickup } from './coinPickupHandler.js'; // ✅ Coin pickup utility
 
 export function initGame(container) {
   const scene = new THREE.Scene();
@@ -62,38 +64,38 @@ export function initGame(container) {
     const delta = clock.getDelta();
     const limit = 150;
     const playerY = player.position.y;
-
-    // Move and despawn vehicles far behind the player
+  
     for (let i = activeVehicles.length - 1; i >= 0; i--) {
       const vehicle = activeVehicles[i];
-
+  
       if (vehicle.position.y < playerY - 300) {
         vehicle.parent?.remove(vehicle);
         activeVehicles.splice(i, 1);
         continue;
       }
-
+  
       moveVehicle(vehicle, vehicle.userData.speed || 20, delta);
       resetVehiclePosition(vehicle, limit);
     }
-
-    // ✅ Scoring based on row passed
+  
     const currentRow = Math.floor(-playerY / LANE_HEIGHT);
     if (currentRow > lastScoredRow) {
       incrementScore();
       lastScoredRow = currentRow;
     }
-
+  
+    checkCoinPickup(player, scene);
+    spinCoins(delta); // ✅ Spins coins smoothly
+  
     updateCamera(camera, player);
     detectCollision(player, activeVehicles);
-
-    // Add new rows when player advances
+  
     const playerRow = Math.floor(-player.position.y / LANE_HEIGHT);
     if (playerRow + 10 > maxRowGenerated) {
       addRows(10);
       maxRowGenerated = metadata.length;
     }
-
+  
     renderer.render(scene, camera);
     requestAnimationFrame(gameLoop);
   }

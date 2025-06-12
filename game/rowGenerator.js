@@ -1,5 +1,9 @@
 import { tilesPerRow } from './constants.js';
 
+function maybeGolden(defaultColor, chance = 0.2) {
+  return Math.random() < chance ? "golden" : defaultColor;
+}
+
 export function generateRows(count) {
   const rows = [];
 
@@ -11,7 +15,7 @@ export function generateRows(count) {
       const trees = [];
 
       while (trees.length < treeCount) {
-        const tileIndex = Math.floor(Math.random() * tilesPerRow * 2) - tilesPerRow; // -tilesPerRow to (tilesPerRow - 1)
+        const tileIndex = Math.floor(Math.random() * tilesPerRow * 2) - tilesPerRow;
         if (takenIndices.has(tileIndex)) continue;
 
         takenIndices.add(tileIndex);
@@ -31,8 +35,8 @@ export function generateRows(count) {
         type: "car",
         direction: 1,
         vehicles: [
-          { initialTileIndex: 0, color: 0xff0000 },
-          { initialTileIndex: 2, color: 0xff0000 },
+          { initialTileIndex: 0, color: maybeGolden(0xff0000) },
+          { initialTileIndex: 2, color: maybeGolden(0xff0000) },
         ],
       });
     } else {
@@ -41,7 +45,7 @@ export function generateRows(count) {
         type: "truck",
         direction: -1,
         vehicles: [
-          { initialTileIndex: 1, color: 0x0000ff },
+          { initialTileIndex: 1, color: maybeGolden(0x0000ff) },
         ],
       });
     }
