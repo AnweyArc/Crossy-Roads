@@ -1,6 +1,7 @@
 import { movePlayer } from './player.js';
+import { checkCoinPickup } from './coinPickupHandler.js'; // ✅ import this
 
-export function setupControls(player, collisionCallback) {
+export function setupControls(player, scene) {
   window.addEventListener('keydown', (event) => {
     let moved = false;
 
@@ -23,9 +24,8 @@ export function setupControls(player, collisionCallback) {
         break;
     }
 
-    // Only check collision if a move was attempted
-    if (moved && collisionCallback) {
-      collisionCallback();
+    if (moved) {
+      checkCoinPickup(player, scene); // ✅ check here after move
     }
   });
 }

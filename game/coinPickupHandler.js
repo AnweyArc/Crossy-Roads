@@ -1,22 +1,26 @@
 // /game/coinPickupHandler.js
 import { coins, removeCoin } from './coins.js';
+import { tileSize } from './constants.js';
 
 let totalGold = 0;
 
 export function checkCoinPickup(player, scene) {
+  const playerTileX = Math.round(player.position.x / tileSize);
+  const playerTileY = Math.round(player.position.y / tileSize);
+
   for (let i = coins.length - 1; i >= 0; i--) {
     const coin = coins[i];
-    const dx = coin.position.x - player.position.x;
-    const dy = coin.position.y - player.position.y;
+    const coinTileX = Math.round(coin.position.x / tileSize);
+    const coinTileY = Math.round(coin.position.y / tileSize);
 
-    // ✅ Coin pickup threshold: within half a tile
-    if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
+    if (coinTileX === playerTileX && coinTileY === playerTileY) {
       totalGold++;
-      console.log("Coin collected! Total gold:", totalGold);
+      console.log("🪙 Coin collected! Total gold:", totalGold);
 
-      // ✅ Remove from scene and list
-      coin.parent?.remove(coin);
-      coins.splice(i, 1);
+      if (coin.parent) {
+        coin.parent.remove(coin);
+      }
+       // ✅ cleaner and handles parent removal
     }
   }
 }

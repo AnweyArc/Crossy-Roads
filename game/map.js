@@ -81,9 +81,10 @@ export function addRows(count = 10, scene) {
           coinTileIndex = Math.floor(Math.random() * 18) - 9;
         } while (blockedTiles.has(`${coinTileIndex},${rowIndex}`));
         const coin = createCoin(coinTileIndex, rowIndex);
-        coin.position.y = 0;
-        coins.push(coin);
-        row.add(coin);
+coin.position.y = rowIndex * LANE_HEIGHT; // Align coin with player
+coins.push(coin);
+row.add(coin);
+
       }
 
       addBoundaryWalls(row);

@@ -40,8 +40,10 @@ export function generateRows(count, scene, currentRowIndex = 0) {
 
       if (possibleIndices.length > 0) {
         const coinTileIndex = possibleIndices[Math.floor(Math.random() * possibleIndices.length)];
-        const coin = createCoin(coinTileIndex, -globalRowIndex); // -Y direction
-        scene.add(coin);
+        const coin = createCoin(coinTileIndex, -globalRowIndex);
+coin.position.y = -globalRowIndex * tileSize; // Align coin with player
+scene.add(coin);
+
       }
 
       rows.push({
