@@ -1,23 +1,24 @@
 import * as THREE from 'three';
 import { tileSize } from './constants.js';
+import { LANE_HEIGHT } from './vehicles.js';
+
 
 export const coins = [];
 
 // Create a standing spinning coin
 export function createCoin(tileX, rowY) {
-    const coin = new THREE.Mesh(
-      new THREE.CylinderGeometry(5, 5, 2, 16),
-      new THREE.MeshLambertMaterial({ color: 0xFFD700 })
-    );
-    
-    // Make coin stand vertically
-    // (do NOT rotate it if you want side to face camera)
-    coin.position.set(tileX * tileSize, rowY * tileSize, 12); // raised for visibility
-    coin.userData.isCoin = true;
+  const coin = new THREE.Mesh(
+    new THREE.CylinderGeometry(5, 5, 2, 16),
+    new THREE.MeshLambertMaterial({ color: 0xFFD700 })
+  );
   
-    coins.push(coin);
-    return coin;
-  }
+  // Correct positioning to match map row layout
+  coin.position.set(tileX * tileSize, rowY * LANE_HEIGHT, 12); // use LANE_HEIGHT for consistency
+  coin.userData.isCoin = true;
+
+  coins.push(coin);
+  return coin;
+}
   
 
 // Remove coin from scene and list

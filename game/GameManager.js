@@ -6,14 +6,14 @@ import { createPlayer } from './player.js';
 import { map, initializeMap, addRows, metadata, activeVehicles } from './map.js';
 import { setupControls } from './controls.js';
 import { detectCollision } from './collision.js';
-import { spinCoins } from './coins.js'; // ⬅️ Add this line
+import { spinCoins, coins } from './coins.js';
 import {
   moveVehicle,
   resetVehiclePosition,
   LANE_HEIGHT
 } from './vehicles.js';
 import { incrementScore, resetScore, onScoreChange } from './score.js';
-import { checkCoinPickup } from './coinPickupHandler.js'; // ✅ Coin pickup utility
+import { checkCoinPickup } from './coinPickupHandler.js';
 
 export function initGame(container) {
   const scene = new THREE.Scene();
@@ -42,7 +42,7 @@ export function initGame(container) {
   });
 
   // Camera setup
-  camera.position.set(0, -200, 200); // Adjusted to better frame the player
+  camera.position.set(0, -200, 200);
   camera.lookAt(0, 0, 0);
   camera.updateProjectionMatrix();
 
@@ -51,7 +51,6 @@ export function initGame(container) {
   let lastScoredRow = 0;
   resetScore();
 
-  // ✅ Update score display in UI
   onScoreChange((score) => {
     const scoreEl = document.getElementById('score');
     if (scoreEl) {
@@ -59,46 +58,54 @@ export function initGame(container) {
     }
   });
 
-  // Game loop
   function gameLoop() {
     const delta = clock.getDelta();
     const limit = 150;
     const playerY = player.position.y;
-  
+
+    // Vehicle logic
     for (let i = activeVehicles.length - 1; i >= 0; i--) {
       const vehicle = activeVehicles[i];
-  
+
       if (vehicle.position.y < playerY - 300) {
         vehicle.parent?.remove(vehicle);
         activeVehicles.splice(i, 1);
         continue;
       }
-  
+
       moveVehicle(vehicle, vehicle.userData.speed || 20, delta);
       resetVehiclePosition(vehicle, limit);
     }
-  
+
+    // ✅ Cleanup coins behind camera
+    for (let i = coins.length - 1; i >= 0; i--) {
+      const coin = coins[i];
+      if (coin.position.y < playerY - 300) {
+        coin.parent?.remove(coin);
+        coins.splice(i, 1);
+      }
+    }
+
     const currentRow = Math.floor(-playerY / LANE_HEIGHT);
     if (currentRow > lastScoredRow) {
       incrementScore();
       lastScoredRow = currentRow;
     }
-  
+
     checkCoinPickup(player, scene);
-    spinCoins(delta); // ✅ Spins coins smoothly
-  
+    spinCoins(delta);
     updateCamera(camera, player);
     detectCollision(player, activeVehicles);
-  
+
     const playerRow = Math.floor(-player.position.y / LANE_HEIGHT);
     if (playerRow + 10 > maxRowGenerated) {
-      addRows(10);
+      addRows(10, scene); // ✅ Now passes scene for rowGenerator coin placement
       maxRowGenerated = metadata.length;
     }
-  
+
     renderer.render(scene, camera);
     requestAnimationFrame(gameLoop);
   }
 
-  gameLoop(); // Start the game loop
+  gameLoop();
 }

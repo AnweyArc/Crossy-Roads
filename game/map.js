@@ -23,11 +23,11 @@ export function initializeMap() {
     map.add(grass);
   }
 
-  addRows(20); // initial rows
+  addRows(20, map); // initial rows
 }
 
-export function addRows(count = 10) {
-  const newMetadata = generateRows(count);
+export function addRows(count = 10, scene) {
+  const newMetadata = generateRows(count, scene, metadata.length);
   const startIndex = metadata.length;
   metadata.push(...newMetadata);
 
@@ -76,7 +76,10 @@ export function addRows(count = 10) {
       // ✅ Add coins to road rows
       const coinCount = Math.floor(Math.random() * 3); // 0 to 2 coins
       for (let i = 0; i < coinCount; i++) {
-        const coinTileIndex = Math.floor(Math.random() * 18) - 9;
+        let coinTileIndex;
+        do {
+          coinTileIndex = Math.floor(Math.random() * 18) - 9;
+        } while (blockedTiles.has(`${coinTileIndex},${rowIndex}`));
         const coin = createCoin(coinTileIndex, rowIndex);
         coin.position.y = 0;
         coins.push(coin);
