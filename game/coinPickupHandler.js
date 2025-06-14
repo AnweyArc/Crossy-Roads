@@ -1,26 +1,29 @@
 // /game/coinPickupHandler.js
 import { coins, removeCoin } from './coins.js';
-import { tileSize } from './constants.js';
+import * as THREE from 'three';
+
 
 let totalGold = 0;
 
 export function checkCoinPickup(player, scene) {
-  const playerTileX = Math.round(player.position.x / tileSize);
-  const playerTileY = Math.round(player.position.y / tileSize);
-
   for (let i = coins.length - 1; i >= 0; i--) {
     const coin = coins[i];
-    const coinTileX = Math.round(coin.position.x / tileSize);
-    const coinTileY = Math.round(coin.position.y / tileSize);
 
-    if (coinTileX === playerTileX && coinTileY === playerTileY) {
+    // Use world positions instead of local ones
+    const coinWorldPos = new THREE.Vector3();
+    coin.getWorldPosition(coinWorldPos);
+
+    const dx = coinWorldPos.x - player.position.x;
+    const dy = coinWorldPos.y - player.position.y;
+
+    if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
       totalGold++;
-      console.log("🪙 Coin collected! Total gold:", totalGold);
+      console.log("Coin collected! Total gold:", totalGold);
 
-      if (coin.parent) {
-        coin.parent.remove(coin);
-      }
-       // ✅ cleaner and handles parent removal
+      // Remove from parent (works whether parent is scene or a group)
+      coin.parent?.remove(coin);
+      coins.splice(i, 1);
     }
   }
 }
+
