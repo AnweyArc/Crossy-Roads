@@ -1,7 +1,5 @@
-// /game/coinPickupHandler.js
-import { coins, removeCoin } from './coins.js';
 import * as THREE from 'three';
-
+import { coins } from './coins.js';
 
 let totalGold = 0;
 
@@ -9,7 +7,6 @@ export function checkCoinPickup(player, scene) {
   for (let i = coins.length - 1; i >= 0; i--) {
     const coin = coins[i];
 
-    // Use world positions instead of local ones
     const coinWorldPos = new THREE.Vector3();
     coin.getWorldPosition(coinWorldPos);
 
@@ -20,10 +17,13 @@ export function checkCoinPickup(player, scene) {
       totalGold++;
       console.log("Coin collected! Total gold:", totalGold);
 
-      // Remove from parent (works whether parent is scene or a group)
       coin.parent?.remove(coin);
       coins.splice(i, 1);
+
+      // ✅ Dispatch event so UI updates
+      window.dispatchEvent(new CustomEvent('goldEarned', {
+        detail: { totalGold }
+      }));
     }
   }
 }
-

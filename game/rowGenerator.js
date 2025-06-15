@@ -1,6 +1,7 @@
 // /game/rowGenerator.js
 import { tilesPerRow, tileSize } from './constants.js';
-import { createCoin } from './coins.js';
+import { createCoin, coins } from './coins.js'; // ✅ also import coins
+
 
 function maybeGolden(defaultColor, chance = 0.2) {
   return Math.random() < chance ? "golden" : defaultColor;
@@ -41,9 +42,8 @@ export function generateRows(count, scene, currentRowIndex = 0) {
       if (possibleIndices.length > 0) {
         const coinTileIndex = possibleIndices[Math.floor(Math.random() * possibleIndices.length)];
         const coin = createCoin(coinTileIndex, -globalRowIndex);
-coin.position.y = -globalRowIndex * tileSize; // Align coin with player
-scene.add(coin);
-
+        scene.add(coin);
+        coins.push(coin); // ✅ this line is crucial
       }
 
       rows.push({
