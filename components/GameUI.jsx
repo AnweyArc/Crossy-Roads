@@ -39,7 +39,7 @@ export default function GameUI() {
           <h1>Game Over</h1>
           <p>Your score: <span id="final-score"></span></p>
           <button id="retry" className="bg-red-500 px-10 py-5 font-[inherit] text-[inherit] cursor-pointer">
-            Retry
+            Try Again?
           </button>
         </div>
       </div>
